@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            width: 300px;
+            margin: auto;
+            padding-top: 50px;
+        }
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .container {
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Login Page</h2>
+
+<form action="/login" method="post">
+    <div class="container">
+        <label for="username"><b>username</b></label>
+        <input type="text" placeholder="please input your username" name="username" id="username" required>
+        <div id="username-error" class="error"></div>
+
+        <label for="password"><b>password</b></label>
+        <input type="password" placeholder="please input your password" name="password" id="password" required>
+        <div id="password-error" class="error"></div>
+
+        <button type="submit">Login</button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('username').addEventListener('input', function(e) {
+        const username = e.target.value;
+        // 检查用户名是否满足要求
+        if (username.length < 4) {
+            document.getElementById('username-error').textContent = 'Username needs to be at least 4 characters.';
+        } else {
+            // 更多的检查，如是否包含非法字符等
+            document.getElementById('username-error').textContent = '';
+        }
+    });
+
+    document.getElementById('password').addEventListener('input', function(e) {
+        const password = e.target.value;
+        // 检查密码是否满足要求
+        if (password.length < 8 || password.length > 64) {
+            document.getElementById('password-error').textContent = 'Password length should be between 8 and 64 characters.';
+        } else {
+            // 更多的检查，如强度检查等
+            document.getElementById('password-error').textContent = '';
+        }
+    });
+
+
+    document.querySelector("form").onsubmit = async function(event) {
+        event.preventDefault(); // 阻止表单默认提交行为
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                alert('Login in successful!');
+                // 跳转到欢迎页面或其他页面
+                window.location.href = '/login.html';
+            } else {
+                const errorText = await response.text();
+                alert('Login failed:' + errorText);
+            }
+        } catch (error) {
+            alert('An error occurred during login');
+            console.error('An error occurred during login', error);
+        }
+    };
+</script>
+
+</body>
+</html>

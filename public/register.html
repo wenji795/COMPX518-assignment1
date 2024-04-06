@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            width: 300px;
+            margin: auto;
+            padding-top: 50px;
+        }
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .container {
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Registration page</h2>
+
+<form action="/register" method="post">
+    <div class="container">
+        <label for="username"><b>username</b></label>
+        <input type="text" placeholder="please input your username" name="username" id="username" required>
+        <div id="username-error" class="error"></div>
+
+        <label for="password"><b>password</b></label>
+        <input type="password" placeholder="please input your password" name="password" id="password" required>
+        <div id="password-error" class="error"></div>
+        <button type="submit">Registration now!</button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('username').addEventListener('input', function(e) {
+        const username = e.target.value;
+        // 检查用户名是否满足要求
+        if (username.length < 4) {
+            document.getElementById('username-error').textContent = 'Username needs to be at least 4 characters.';
+        } else {
+            // 更多的检查，如是否包含非法字符等
+            document.getElementById('username-error').textContent = '';
+        }
+    });
+
+
+
+    document.getElementById('password').addEventListener('input', function(e) {
+        const password = e.target.value;
+        // 检查密码是否满足要求
+        if (password.length < 8 || password.length > 64) {
+            document.getElementById('password-error').textContent = 'Password length should be between 8 and 64 characters.';
+        } else {
+            // 更多的检查，如强度检查等
+            document.getElementById('password-error').textContent = '';
+        }
+    });
+
+    document.getElementById('username').addEventListener('blur', async function() {
+        const username = this.value; // 获取用户名输入框的值
+        const response = await fetch(`/check-username?username=${encodeURIComponent(username)}`);
+        const data = await response.json();
+
+        if (data.usernameExists) {
+            // 如果用户名已存在，显示一条错误消息
+            alert('Username is already taken, please choose another username.');
+        } else {
+            // 如果用户名不存在，可以继续填写表单
+        }
+    });
+
+
+    document.querySelector("form").onsubmit = async function(event) {
+        event.preventDefault(); // 阻止表单默认提交行为
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                alert('Registration success!');
+                // 跳转到登录页面或其他页面
+                window.location.href = '/login.html';
+            } else {
+                const errorText = await response.text();
+                alert('registration failed:' + errorText);
+            }
+        } catch (error) {
+            alert('An error occurred during registration');
+            console.error('An error occurred during registration', error);
+        }
+    };
+</script>
+
+</body>
+</html>
